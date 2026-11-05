@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   const C = window.Calc;
-  const VERSION = '1.0.0';
+  const VERSION = '1.0.1';
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -51,6 +51,16 @@
     const CUR = '<span class="cr"></span>';
     let inExp = false;
     const slotIfEmpty = i => { if (CLOSE_OR_SEP.has(toks[i]) && cp !== i) out.push('<span class="slot"></span>'); };
+    const dotBefore = [];
+    for (let i = 0; i < toks.length;) {
+      if (/^\d$/.test(toks[i]) && toks[i - 1] !== ',' && toks[i - 1] !== 'E' && !(toks[i - 1] === '−' && toks[i - 2] === 'E') && !/^\d$/.test(toks[i - 1] || '')) {
+        let j = i; while (j < toks.length && /^\d$/.test(toks[j])) j++;
+        for (let k = i + 1; k < j; k++) if ((j - k) % 3 === 0) dotBefore[k] = true;
+        i = j;
+      } else if (toks[i] === ',' || toks[i] === 'E') {
+        i++; while (i < toks.length && (/^\d$/.test(toks[i]) || (toks[i] === '−' && toks[i - 1] === 'E'))) i++;
+      } else i++;
+    }
     for (let i = 0; i <= toks.length; i++) {
       const t = toks[i];
       if (inExp && !(t !== undefined && (/^\d$/.test(t) || (t === '−' && toks[i - 1] === 'E')))) {
@@ -58,6 +68,7 @@
         if (cp === i) { out.push(CUR); cp = -1; }
         out.push('</sup>'); inExp = false;
       }
+      if (dotBefore[i]) out.push('.');
       if (cp === i) out.push(CUR);
       if (t === undefined) break;
       switch (t) {

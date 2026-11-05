@@ -11,115 +11,138 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Hesap Makinesi">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icons/apple-touch-icon.png">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/icon-v2.png">
+<link rel="apple-touch-icon" href="icons/icon-v2.png">
 <link rel="stylesheet" href="style.css">
 </head>
 <body data-theme="lacivert">
 <div id="app">
-<header class="bar">
-<button class="ib" id="btnMenu" aria-label="Menü"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-<span class="status" id="status">NORM</span>
-<span class="bar-r">
-<button class="ib" id="btnTheme" aria-label="Tema"><svg viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 1 9-9c0 2.2-1.8 3-3.5 3H15a2 2 0 0 0-1.4 3.4c.4.5.4 1.2 0 1.7-.4.6-1 .9-1.6.9z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="11" cy="7" r="1.2"/><circle cx="15.5" cy="8.5" r="1.2"/></svg></button>
-<button class="ib" id="btnSettings" aria-label="Ayarlar"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
-</span>
-</header>
-<section class="lcd" id="lcd" aria-live="polite"></section>
-<section class="kb" id="kb">
-<button class="k k-shift" data-k="shift">SHIFT</button>
-<button class="k" data-k="lp"><s>%</s>(</button>
-<button class="k" data-k="rp">)</button>
-<div class="k k-split"><span data-k="left" aria-label="Sol">◀</span><span data-k="right" aria-label="Sağ">▶</span></div>
-<div class="k k-split"><span data-k="up" aria-label="Yukarı">▲</span><span data-k="down" aria-label="Aşağı">▼</span></div>
-<button class="k" data-k="frac" aria-label="Kesir"><span class="fr-ico"><i></i><b></b><i></i></span></button>
-<button class="k" data-k="sqrt"><s>∛</s>√</button>
-<button class="k hw" data-k="sq">x<sup>2</sup></button>
-<button class="k hw" data-k="pow"><s>ⁿ√</s>x<sup>n</sup></button>
-<button class="k k-sm" data-k="sd">S⇔D</button>
-<button class="k n" data-k="7">7</button>
-<button class="k n" data-k="8">8</button>
-<button class="k n" data-k="9">9</button>
-<button class="k n k-del" data-k="del" aria-label="Sil"><svg viewBox="0 0 24 24"><path d="M20 6H9l-6 6 6 6h11a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1zM12 9l6 6M18 9l-6 6"/></svg></button>
-<button class="k n k-ac" data-k="ac"><s>Tümünü sil</s>AC</button>
-<button class="k n" data-k="4">4</button>
-<button class="k n" data-k="5">5</button>
-<button class="k n" data-k="6">6</button>
-<button class="k o" data-k="mul">×</button>
-<button class="k o" data-k="div">÷</button>
-<button class="k n" data-k="1">1</button>
-<button class="k n" data-k="2">2</button>
-<button class="k n" data-k="3">3</button>
-<button class="k o" data-k="add">+</button>
-<button class="k o" data-k="sub">−</button>
-<button class="k n" data-k="0"><s>Kopyala</s>0</button>
-<button class="k n" data-k="comma">,</button>
-<button class="k n k-exp" data-k="exp"><s>π</s>×10<sup>n</sup></button>
-<button class="k o k-ans" data-k="ans"><s>Önceki</s>Ans</button>
-<button class="k k-eq" data-k="eq"><s>Geçmiş</s>=</button>
-</section>
+  <header class="bar">
+    <button class="ib" id="btnMenu" aria-label="Menü"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <span class="status" id="status">NORM</span>
+    <span class="bar-r">
+      <button class="ib" id="btnTheme" aria-label="Tema"><svg viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 1 9-9c0 2.2-1.8 3-3.5 3H15a2 2 0 0 0-1.4 3.4c.4.5.4 1.2 0 1.7-.4.6-1 .9-1.6.9z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="11" cy="7" r="1.2"/><circle cx="15.5" cy="8.5" r="1.2"/></svg></button>
+      <button class="ib" id="btnSettings" aria-label="Ayarlar"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+    </span>
+  </header>
+
+  <section class="lcd" id="lcd" aria-live="polite"></section>
+
+  <section class="kb" id="kb">
+    <button class="k k-shift" data-k="shift">SHIFT</button>
+    <button class="k" data-k="lp"><s>%</s>(</button>
+    <button class="k" data-k="rp">)</button>
+    <div class="k k-split"><span data-k="left" aria-label="Sol">◀</span><span data-k="right" aria-label="Sağ">▶</span></div>
+    <div class="k k-split"><span data-k="up" aria-label="Yukarı">▲</span><span data-k="down" aria-label="Aşağı">▼</span></div>
+
+    <button class="k" data-k="frac" aria-label="Kesir"><span class="fr-ico"><i></i><b></b><i></i></span></button>
+    <button class="k" data-k="sqrt"><s>∛</s>√</button>
+    <button class="k hw" data-k="sq">x<sup>2</sup></button>
+    <button class="k hw" data-k="pow"><s>ⁿ√</s>x<sup>n</sup></button>
+    <button class="k k-sm" data-k="sd">S⇔D</button>
+
+    <button class="k n" data-k="7">7</button>
+    <button class="k n" data-k="8">8</button>
+    <button class="k n" data-k="9">9</button>
+    <button class="k n k-del" data-k="del" aria-label="Sil"><svg viewBox="0 0 24 24"><path d="M20 6H9l-6 6 6 6h11a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1zM12 9l6 6M18 9l-6 6"/></svg></button>
+    <button class="k n k-ac" data-k="ac"><s>Tümünü sil</s>AC</button>
+
+    <button class="k n" data-k="4">4</button>
+    <button class="k n" data-k="5">5</button>
+    <button class="k n" data-k="6">6</button>
+    <button class="k o" data-k="mul">×</button>
+    <button class="k o" data-k="div">÷</button>
+
+    <button class="k n" data-k="1">1</button>
+    <button class="k n" data-k="2">2</button>
+    <button class="k n" data-k="3">3</button>
+    <button class="k o" data-k="add">+</button>
+    <button class="k o" data-k="sub">−</button>
+
+    <button class="k n" data-k="0"><s>Kopyala</s>0</button>
+    <button class="k n" data-k="comma">,</button>
+    <button class="k n k-exp" data-k="exp"><s>π</s>×10<sup>n</sup></button>
+    <button class="k o k-ans" data-k="ans"><s>Önceki</s>Ans</button>
+    <button class="k k-eq" data-k="eq"><s>Geçmiş</s>=</button>
+  </section>
 </div>
+
+<!-- Menü -->
 <div class="sheet" id="menu" hidden>
-<div class="panel menu-panel">
-<button class="row" data-open="history">Geçmiş</button>
-<button class="row" data-open="settings">Ayarlar</button>
-<button class="row" data-open="themes">Tema</button>
-<button class="row" data-open="about">Hakkında</button>
+  <div class="panel menu-panel">
+    <button class="row" data-open="history">Geçmiş</button>
+    <button class="row" data-open="settings">Ayarlar</button>
+    <button class="row" data-open="themes">Tema</button>
+    <button class="row" data-open="about">Hakkında</button>
+  </div>
 </div>
-</div>
+
+<!-- Geçmiş (kareli defter) -->
 <div class="sheet full" id="history" hidden>
-<div class="paper-wrap">
-<div class="paper-head">
-<button class="pb" data-close>Kapat</button>
-<span>Geçmiş</span>
-<button class="pb" id="histClear">Temizle</button>
+  <div class="paper-wrap">
+    <div class="paper-head">
+      <button class="pb" data-close>Kapat</button>
+      <span>Geçmiş</span>
+      <button class="pb" id="histClear">Temizle</button>
+    </div>
+    <div class="paper" id="paper"><div class="margin"></div><div id="paperList"></div></div>
+  </div>
 </div>
-<div class="paper" id="paper"><div class="margin"></div><div id="paperList"></div></div>
-</div>
-</div>
+
+<!-- Ayarlar -->
 <div class="sheet" id="settings" hidden>
-<div class="panel">
-<div class="ph"><span>Ayarlar</span><button class="pb" data-close>Kapat</button></div>
-<div class="set">
-<div class="lbl">Ondalık gösterim</div>
-<div class="seg" id="segFix">
-<button data-fix="norm">Normal</button><button data-fix="2">2 hane</button><button data-fix="3">3 hane</button><button data-fix="4">4 hane</button>
+  <div class="panel">
+    <div class="ph"><span>Ayarlar</span><button class="pb" data-close>Kapat</button></div>
+    <div class="set">
+      <div class="lbl">Ondalık gösterim</div>
+      <div class="seg" id="segFix">
+        <button data-fix="norm">Normal</button><button data-fix="2">2 hane</button><button data-fix="3">3 hane</button><button data-fix="4">4 hane</button>
+      </div>
+    </div>
+    <div class="set row-flex">
+      <div class="lbl">Tuş sesi</div>
+      <button class="tog" id="togSound" role="switch" aria-checked="false"><i></i></button>
+    </div>
+    <button class="row" data-open="themes">Tema seç</button>
+    <button class="row danger" id="setClear">Geçmişi temizle</button>
+  </div>
 </div>
-</div>
-<div class="set row-flex">
-<div class="lbl">Tuş sesi</div>
-<button class="tog" id="togSound" role="switch" aria-checked="false"><i></i></button>
-</div>
-<button class="row" data-open="themes">Tema seç</button>
-<button class="row danger" id="setClear">Geçmişi temizle</button>
-</div>
-</div>
+
+<!-- Temalar -->
 <div class="sheet" id="themes" hidden>
-<div class="panel">
-<div class="ph"><span>Tema</span><button class="pb" data-close>Kapat</button></div>
-<div class="themes" id="themeList"></div>
+  <div class="panel">
+    <div class="ph"><span>Tema</span><button class="pb" data-close>Kapat</button></div>
+    <div class="themes" id="themeList"></div>
+  </div>
 </div>
-</div>
+
+<!-- Hakkında -->
 <div class="sheet" id="about" hidden>
-<div class="panel">
-<div class="ph"><span>Hakkında</span><button class="pb" data-close>Kapat</button></div>
-<p class="about"><b>Hesap Makinesi</b> <span id="ver"></span><br>Reklamsız, internetsiz çalışır. Hesaplar ve geçmiş yalnızca bu telefonda saklanır.<br><br>Kesin hesap: 0,1 + 0,2 = 0,3. Sonuç ondalık gelir, S⇔D ile kesre çevrilir.</p>
+  <div class="panel">
+    <div class="ph"><span>Hakkında</span><button class="pb" data-close>Kapat</button></div>
+    <p class="about"><b>Hesap Makinesi</b> <span id="ver"></span><br>Reklamsız, internetsiz çalışır. Hesaplar ve geçmiş yalnızca bu telefonda saklanır.<br><br>Kesin hesap: 0,1 + 0,2 = 0,3. Sonuç ondalık gelir, S⇔D ile kesre çevrilir.</p>
+  </div>
 </div>
-</div>
+
+<!-- Kopyala / yapıştır -->
 <div class="sheet" id="clip" hidden>
-<div class="panel">
-<div class="ph"><span>Kopyala / Yapıştır</span><button class="pb" data-close>Kapat</button></div>
-<button class="row" id="clipCopy">Sonucu kopyala</button>
-<button class="row" id="clipPaste">Yapıştır</button>
+  <div class="panel">
+    <div class="ph"><span>Kopyala / Yapıştır</span><button class="pb" data-close>Kapat</button></div>
+    <button class="row" id="clipCopy">Sonucu kopyala</button>
+    <button class="row" id="clipPaste">Yapıştır</button>
+  </div>
 </div>
-</div>
+
+<!-- Onay -->
 <div class="sheet" id="confirm" hidden>
-<div class="panel">
-<p class="cq" id="confirmText">Ekran ve geçmiş tamamen silinsin mi?</p>
-<div class="cbtns"><button class="pb" data-close>Vazgeç</button><button class="pb danger" id="confirmOk">Sil</button></div>
+  <div class="panel">
+    <p class="cq" id="confirmText">Ekran ve geçmiş tamamen silinsin mi?</p>
+    <div class="cbtns"><button class="pb" data-close>Vazgeç</button><button class="pb danger" id="confirmOk">Sil</button></div>
+  </div>
 </div>
-</div>
+
 <div class="toast" id="toast" hidden></div>
+
 <script src="core.js"></script>
 <script src="app.js"></script>
 </body>

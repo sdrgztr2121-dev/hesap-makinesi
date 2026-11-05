@@ -1,8 +1,8 @@
 /* Hesap Makinesi - internetsiz çalışma */
-const CACHE = 'hm-v1.0.0';
+const CACHE = 'hm-v1.0.1';
 const FONTS = ['https://cdn.jsdelivr.net/npm/@fontsource/caveat@5.3.0/files/caveat-latin-400-normal.woff2', 'https://cdn.jsdelivr.net/npm/@fontsource/caveat@5.3.0/files/caveat-latin-ext-400-normal.woff2'];
 const FILES = ['./', 'index.html', 'style.css', 'core.js', 'app.js', 'manifest.webmanifest',
-  'icons/apple-touch-icon.png'];
+  'icons/icon-v2.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES).then(() => Promise.all(FONTS.map(u => c.add(new Request(u, { mode: 'cors' })).catch(() => {})))))
     .then(() => self.skipWaiting()));
