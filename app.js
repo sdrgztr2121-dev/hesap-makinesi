@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   const C = window.Calc;
-  const VERSION = '1.0.5';
+  const VERSION = '1.0.6';
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -24,7 +24,7 @@
   })();
   function saveState() {
     store.set('hm.state', {
-      lines: st.lines.slice(-30).map(l => ({ tokens: l.tokens, v: C.ser(l.v), frac: l.frac, t: l.t, a: C.ser(l.ansUsed), p: C.ser(l.preUsed) })),
+      lines: st.lines.slice(-60).map(l => ({ tokens: l.tokens, v: C.ser(l.v), frac: l.frac, t: l.t, a: C.ser(l.ansUsed), p: C.ser(l.preUsed) })),
       ans: C.ser(st.ans), preAns: C.ser(st.preAns)
     });
   }
@@ -116,7 +116,7 @@
     while (el.scrollWidth > el.clientWidth + 1 && fs > minPx && guard++ < 40) { fs -= 2; el.style.fontSize = fs + 'px'; }
   }
   function render() {
-    const lines = st.lines.slice(-25);
+    const lines = st.lines.slice(-60);
     const base = st.lines.length - lines.length;
     let h = '';
     lines.forEach((l, i) => {
@@ -128,6 +128,7 @@
     else { const v = C.live(st); res = v ? valueHTML(v, false) : ''; }
     h += `<div class="cur"><div class="e">${tokensHTML(st.tokens, st.cp)}</div><div class="${cls}">${res}</div></div>`;
     lcd.innerHTML = h;
+    lcd.scrollTop = lcd.scrollHeight;
     lcd.querySelectorAll('.r').forEach(r => fit(r, r.closest('.cur') ? 18 : 12));
     fitExpr(lcd.querySelector('.cur .e'));
     document.body.classList.toggle('shift', st.shift);
@@ -202,7 +203,7 @@
     open('confirm');
   }
   const clearHistory = () => { history = []; saveHist(); toast('Geçmiş temizlendi'); };
-  $('histClear').onclick = () => confirmClear('Geçmiş tamamen silinsin mi?', clearHistory);
+  $('histClear').onclick = () => confirmClear('Geçmiş defterindeki tüm hesaplar silinsin mi? Bu geri alınamaz.', clearHistory);
   $('setClear').onclick = () => confirmClear('Geçmiş tamamen silinsin mi?', clearHistory);
 
   function renderSettings() {
@@ -270,7 +271,7 @@
         history.push({ tokens: l.tokens, v: C.ser(l.v), t: l.t, a: C.ser(l.ansUsed), p: C.ser(l.preUsed) });
         saveHist();
       } else if (f.type === 'confirmClear') {
-        confirmClear('Ekran ve geçmiş tamamen silinsin mi?', () => { st.lines = []; st.tokens = []; st.cp = 0; history = []; saveHist(); saveState(); });
+        confirmClear('Ekrandaki hesaplar silinsin mi? Geçmiş defterin korunur.', () => { st.lines = []; st.tokens = []; st.cp = 0; st.recall = -1; saveState(); });
       } else if (f.type === 'copy') open('clip');
       else if (f.type === 'openHistory') open('history');
     }
