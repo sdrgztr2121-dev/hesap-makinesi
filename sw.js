@@ -1,5 +1,5 @@
 /* Hesap Makinesi - internetsiz çalışma */
-const CACHE = 'hm-v1.0.1';
+const CACHE = 'hm-v1.0.2';
 const FONTS = ['https://cdn.jsdelivr.net/npm/@fontsource/caveat@5.3.0/files/caveat-latin-400-normal.woff2', 'https://cdn.jsdelivr.net/npm/@fontsource/caveat@5.3.0/files/caveat-latin-ext-400-normal.woff2'];
 const FILES = ['./', 'index.html', 'style.css', 'core.js', 'app.js', 'manifest.webmanifest',
   'icons/icon-v2.png'];
