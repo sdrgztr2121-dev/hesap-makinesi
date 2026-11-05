@@ -1,0 +1,14 @@
+{
+  "name": "Hesap Makinesi",
+  "short_name": "Hesap Makinesi",
+  "lang": "tr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1B2333",
+  "theme_color": "#1B2333",
+  "icons": [
+    { "src": "icons/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}
