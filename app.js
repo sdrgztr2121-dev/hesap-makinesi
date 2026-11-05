@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   const C = window.Calc;
-  const VERSION = '1.0.2';
+  const VERSION = '1.0.3';
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -289,6 +289,11 @@
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
 
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    const hadController = !!navigator.serviceWorker.controller;
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (hadController && !reloaded) { reloaded = true; location.reload(); }
+    });
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
   window.__hm = { st, handle, render, settings };

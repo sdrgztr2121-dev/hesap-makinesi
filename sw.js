@@ -1,5 +1,5 @@
 /* Hesap Makinesi - internetsiz çalışma */
-const CACHE = 'hm-v1.0.2';
+const CACHE = 'hm-v1.0.3';
 const FONTS = ['https://cdn.jsdelivr.net/npm/@fontsource/caveat@5.3.0/files/caveat-latin-400-normal.woff2', 'https://cdn.jsdelivr.net/npm/@fontsource/caveat@5.3.0/files/caveat-latin-ext-400-normal.woff2'];
 const FILES = ['./', 'index.html', 'style.css', 'core.js', 'app.js', 'manifest.webmanifest',
   'icons/icon-v2.png'];
@@ -12,16 +12,26 @@ self.addEventListener('activate', e => {
 });
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
-  e.respondWith(
-    caches.match(e.request, { ignoreSearch: true }).then(hit => {
-      const net = fetch(e.request).then(res => {
-        if (res && res.ok && (new URL(e.request.url).origin === location.origin || e.request.url.startsWith('https://cdn.jsdelivr.net/'))) {
-          const copy = res.clone();
-          caches.open(CACHE).then(c => c.put(e.request, copy));
-        }
-        return res;
-      }).catch(() => hit || caches.match('index.html'));
-      return hit || net;
-    })
-  );
+  const url = new URL(e.request.url);
+  if (url.origin !== location.origin) {
+    // yazı tipi: önce önbellek
+    e.respondWith(caches.match(e.request).then(hit => hit || fetch(e.request).then(res => {
+      if (res && res.ok) { const c = res.clone(); caches.open(CACHE).then(x => x.put(e.request, c)); }
+      return res;
+    })));
+    return;
+  }
+  // uygulama dosyaları: önce internet (en güncel sürüm), yoksa önbellek
+  e.respondWith((async () => {
+    try {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 4000);
+      const res = await fetch(e.request, { cache: 'no-cache', signal: ctrl.signal });
+      clearTimeout(t);
+      if (res && res.ok) { const c = res.clone(); caches.open(CACHE).then(x => x.put(e.request, c)); }
+      return res;
+    } catch (err) {
+      return (await caches.match(e.request, { ignoreSearch: true })) || (await caches.match('index.html'));
+    }
+  })());
 });

@@ -22,14 +22,14 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .lcd{flex:1;min-height:140px;margin:4px 0 0;background:var(--lcd);color:var(--lcdt);border-radius:16px;padding:8px 14px 10px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;font-family:var(--hw)}
 .ln{border-bottom:1px solid var(--lcdl);padding:2px 0;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;column-gap:10px}
 .ln .e{font-size:16px;line-height:1.15;word-break:break-all}
-.ln .r{font-size:20px;line-height:1.15;text-align:right;white-space:nowrap;margin-left:auto;max-width:100%;padding-right:.18em}
+.ln .r{font-size:20px;line-height:1.15;text-align:right;white-space:nowrap;margin-left:auto;max-width:100%;padding-right:.3em}
 .ln.tap:active{background:rgba(127,127,127,.12)}
 .cur{padding-top:4px}
-.cur .e{font-size:32px;line-height:1.2;word-break:break-all;min-height:38px;padding-right:.18em}
-.cur .r{font-size:40px;line-height:1.15;text-align:right;white-space:nowrap;color:var(--muted);min-height:46px;padding-right:.18em}
+.cur .e{font-size:32px;line-height:1.2;word-break:break-all;min-height:38px;padding-right:.3em}
+.cur .r{font-size:40px;line-height:1.15;text-align:right;white-space:nowrap;color:var(--muted);min-height:46px;padding-right:.3em}
 .cur .r.err{color:var(--err);font-size:30px}
 .r .fr{font-size:.8em}
-.cr{display:inline-block;width:2px;height:.9em;background:var(--acc);vertical-align:-.12em;margin:0 .04em 0 .16em;animation:blink 1s steps(1) infinite}
+.cr{display:inline-block;width:2px;height:.9em;background:var(--acc);vertical-align:-.12em;margin:0 .06em 0 .28em;animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
 
 /* 2B matematik */
