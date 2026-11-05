@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   const C = window.Calc;
-  const VERSION = '1.0.3';
+  const VERSION = '1.0.4';
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -45,6 +45,7 @@
   }
 
   const CLOSE_OR_SEP = new Set(['⟫', '⟩', '|', '‖']);
+  const VALUE_END = new Set([')', '⟫', '⟩', 'π', 'Ans', 'PreAns', '²', '%']);
   function tokensHTML(toks, cp, ctx) {
     const out = [];
     const stack = [];
@@ -85,6 +86,12 @@
         case 'E': out.push('×10<sup>'); inExp = true; break;
         case 'Ans': out.push(ctx && ctx.ans ? '(' + esc(C.format(ctx.ans, fmtOpt())) + ')' : 'Ans'); break;
         case 'PreAns': out.push(ctx && ctx.pre ? '(' + esc(C.format(ctx.pre, fmtOpt())) + ')' : 'PreAns'); break;
+        case '+': case '−': case '×': case '÷': {
+          const pv = toks[i - 1];
+          const binary = pv !== undefined && pv !== 'E' && (/^\d$/.test(pv) || VALUE_END.has(pv));
+          out.push(binary ? '<wbr><span class="op b">' + t + '</span>' : '<span class="op">' + t + '</span>');
+          break;
+        }
         default: out.push(esc(t));
       }
     }
@@ -92,6 +99,16 @@
   }
 
   const lcd = $('lcd');
+  // uzun işlem: önce tek satıra sığacak kadar küçül (en fazla %70), sığmazsa işaretlerden alta geç
+  function fitExpr(el) {
+    el.style.fontSize = '';
+    const base = parseFloat(getComputedStyle(el).fontSize);
+    const min = Math.round(base * 0.7);
+    el.style.whiteSpace = 'nowrap';
+    let fs = base, guard = 0;
+    while (el.scrollWidth > el.clientWidth + 1 && fs > min && guard++ < 30) { fs -= 1; el.style.fontSize = fs + 'px'; }
+    el.style.whiteSpace = '';
+  }
   function fit(el, minPx) {
     el.style.fontSize = '';
     let fs = parseFloat(getComputedStyle(el).fontSize);
@@ -112,6 +129,7 @@
     h += `<div class="cur"><div class="e">${tokensHTML(st.tokens, st.cp)}</div><div class="${cls}">${res}</div></div>`;
     lcd.innerHTML = h;
     lcd.querySelectorAll('.r').forEach(r => fit(r, r.closest('.cur') ? 18 : 12));
+    fitExpr(lcd.querySelector('.cur .e'));
     document.body.classList.toggle('shift', st.shift);
     $('status').textContent = (st.shift ? 'S · ' : '') + (settings.fix === 'norm' ? 'NORM' : 'FIX ' + settings.fix);
   }
