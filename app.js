@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   const C = window.Calc;
-  const VERSION = '1.0.4';
+  const VERSION = '1.0.5';
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -178,7 +178,7 @@
     const list = $('paperList');
     if (!history.length) { list.innerHTML = '<div class="empty">Henüz hesap yok. Yaptığın hesaplar burada birikir.</div>'; return; }
     let h = '', last = '';
-    for (let i = history.length - 1; i >= 0; i--) {
+    for (let i = 0; i < history.length; i++) {
       const e = history[i];
       const d = dayLabel(e.t);
       if (d !== last) { h += `<div class="pd">${d}</div>`; last = d; }
@@ -186,6 +186,8 @@
       h += `<div class="pe" data-h="${i}"><span class="t">${timeLabel(e.t)}</span>${tokensHTML(e.tokens, -1, { ans: C.deser(e.a), pre: C.deser(e.p) })} = <b>${valueHTML(v, false)}</b></div>`;
     }
     list.innerHTML = h;
+    const paper = $('paper');
+    requestAnimationFrame(() => { paper.scrollTop = paper.scrollHeight; });
   }
   $('paperList').addEventListener('click', e => {
     const r = e.target.closest('[data-h]');
