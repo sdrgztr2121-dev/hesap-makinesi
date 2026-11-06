@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   const C = window.Calc;
-  const VERSION = '1.0.16';
+  const VERSION = '1.0.17';
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -10,7 +10,7 @@
     get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { } }
   };
-  const settings = Object.assign({ fix: 'norm', sound: false, vib: true, theme: 'lacivert' }, store.get('hm.set', {}));
+  const settings = Object.assign({ fix: 'norm', sound: false, theme: 'lacivert' }, store.get('hm.set', {}));
   let history = store.get('hm.hist', []);
   const st = C.newState();
   (function restore() {
@@ -136,30 +136,6 @@
   }
 
   let actx = null;
-  // Titreşim
-  // Android: navigator.vibrate. iPhone (iOS 18+): her tuşun üstüne görünmez bir "switch" yerleştirilir;
-  // iOS sistem titreşimini yalnızca parmak gerçekten o anahtara dokununca çalar.
-  const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  function setupHaptics() {
-    if (!IS_IOS) return;
-    document.querySelectorAll('#kb [data-k]').forEach(el => {
-      if (el.querySelector(':scope > .hap')) return;
-      const lb = document.createElement('label');
-      lb.className = 'hap'; lb.setAttribute('aria-hidden', 'true');
-      const inp = document.createElement('input');
-      inp.type = 'checkbox'; inp.setAttribute('switch', ''); inp.tabIndex = -1;
-      inp.addEventListener('click', e => e.stopPropagation());
-      lb.append(inp);
-      if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
-      el.append(lb);
-    });
-    applyHaptics();
-  }
-  function applyHaptics() { document.body.classList.toggle('no-hap', !settings.vib); }
-  function haptic() {
-    if (!settings.vib || IS_IOS) return;
-    try { if (navigator.vibrate) navigator.vibrate(8); } catch (e) { }
-  }
   function click() {
     if (!settings.sound) return;
     try {
@@ -233,14 +209,12 @@
   function renderSettings() {
     $('segFix').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.fix === String(settings.fix)));
     $('togSound').setAttribute('aria-checked', settings.sound ? 'true' : 'false');
-    $('togVib').setAttribute('aria-checked', settings.vib ? 'true' : 'false');
   }
   $('segFix').addEventListener('click', e => {
     const b = e.target.closest('[data-fix]'); if (!b) return;
     settings.fix = b.dataset.fix; saveSet(); renderSettings(); render();
   });
   $('togSound').onclick = () => { settings.sound = !settings.sound; saveSet(); renderSettings(); click(); };
-  $('togVib').onclick = () => { settings.vib = !settings.vib; saveSet(); renderSettings(); applyHaptics(); haptic(); };
 
   const THEMES = [
     { id: 'lacivert', name: 'Lacivert', body: '#1B2333', lcd: '#EEF1E6', key: '#3A4864', acc: '#E07A2E' },
@@ -289,7 +263,6 @@
   };
 
   function handle(key) {
-    haptic();
     click();
     const fx = C.press(st, key);
     for (const f of fx) {
@@ -339,7 +312,6 @@
     if (el) el.textContent = `Ekran ölçümü: ${innerHeight} / ${screen.height} / ${dvh} / ${navigator.standalone ? 'A' : 'S'}`;
   });
   applyTheme();
-  setupHaptics();
   render();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
 
