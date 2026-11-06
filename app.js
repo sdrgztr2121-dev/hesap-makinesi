@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   const C = window.Calc;
-  const VERSION = '1.0.17';
+  const VERSION = '1.0.18';
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -262,8 +262,25 @@
     } catch (e) { toast('Pano okunamadı'); }
   };
 
+  // Kısayollar: AC'ye 3 kez üst üste basınca ekran temizlenir; = ile hesap bittikten sonra
+  // bir kez daha = basınca geçmiş defteri açılır.
+  let prevKey = null, acCount = 0, acStart = 0;
+  function clearScreen() { st.lines = []; st.tokens = []; st.cp = 0; st.recall = -1; st.error = null; saveState(); }
   function handle(key) {
     click();
+    const shifted = st.shift;
+    if (key === 'ac' && !shifted) {
+      const now = Date.now();
+      if (prevKey === 'ac' && now - acStart < 2000) acCount++; else { acCount = 1; acStart = now; }
+      if (acCount >= 3) {
+        acCount = 0; prevKey = null; C.press(st, 'ac'); clearScreen(); render(); toast('Ekran temizlendi');
+        return;
+      }
+    }
+    if (key === 'eq' && !shifted && prevKey === 'eq' && !st.tokens.length && !st.error) {
+      prevKey = null; open('history'); render(); return;
+    }
+    prevKey = shifted ? null : key;
     const fx = C.press(st, key);
     for (const f of fx) {
       if (f.type === 'historyAdd') {
@@ -271,7 +288,7 @@
         history.push({ tokens: l.tokens, v: C.ser(l.v), t: l.t, a: C.ser(l.ansUsed), p: C.ser(l.preUsed) });
         saveHist();
       } else if (f.type === 'confirmClear') {
-        confirmClear('Ekrandaki hesaplar silinsin mi? Geçmiş defterin korunur.', () => { st.lines = []; st.tokens = []; st.cp = 0; st.recall = -1; saveState(); });
+        clearScreen(); toast('Ekran temizlendi');
       } else if (f.type === 'copy') open('clip');
       else if (f.type === 'openHistory') open('history');
     }
