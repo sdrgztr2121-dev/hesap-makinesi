@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   const C = window.Calc;
-  const VERSION = '1.0.7';
+  const VERSION = '1.0.8';
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -310,12 +310,22 @@
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
 
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    // Açılış anında telefondaki kopyadan olur. Güncelleme arka planda kontrol edilir;
+    // yeni sürüm inmişse uygulama arka plana alındığında sessizce yenilenir (kullanıcı hesabın ortasında kesilmez).
     const hadController = !!navigator.serviceWorker.controller;
-    let reloaded = false;
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (hadController && !reloaded) { reloaded = true; location.reload(); }
+    let updateReady = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController) updateReady = true; });
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden' && updateReady) { updateReady = false; location.reload(); }
+      if (document.visibilityState === 'visible' && navigator.onLine) check();
     });
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    let reg = null;
+    const check = () => { if (reg) reg.update().catch(() => {}); };
+    const start = () => navigator.serviceWorker.register('sw.js').then(r => { reg = r; }).catch(() => {});
+    // kaydı ilk çizimden sonraya bırak ki açılışı yavaşlatmasın
+    if (document.readyState === 'complete') setTimeout(start, 300);
+    else window.addEventListener('load', () => setTimeout(start, 300));
+    window.addEventListener('online', check);
   }
   window.__hm = { st, handle, render, settings };
 })();
