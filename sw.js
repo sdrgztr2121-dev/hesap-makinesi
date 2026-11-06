@@ -1,7 +1,7 @@
 /* Hesap Makinesi - internetsiz çalışma
    Açılış her zaman telefondaki kopyadan (anında). Yeni sürüm arka planda indirilir,
    bir sonraki açılışta devreye girer. */
-const CACHE = 'hm-v1.0.9';
+const CACHE = 'hm-v1.0.10';
 const FONTS = ['https://cdn.jsdelivr.net/npm/@fontsource/caveat@5.3.0/files/caveat-latin-400-normal.woff2', 'https://cdn.jsdelivr.net/npm/@fontsource/caveat@5.3.0/files/caveat-latin-ext-400-normal.woff2'];
 const FILES = ['./', 'index.html', 'style.css', 'core.js', 'app.js', 'manifest.webmanifest',
   'icons/icon-v2.png', 'icons/icon-192.png', 'icons/icon-512.png'];
