@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   const C = window.Calc;
-  const VERSION = '1.0.12';
+  const VERSION = '1.0.13';
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -305,6 +305,12 @@
   document.addEventListener('gesturestart', e => e.preventDefault());
 
   $('ver').textContent = 'sürüm ' + VERSION;
+  document.querySelector('[data-open="about"]') && document.querySelector('[data-open="about"]').addEventListener('click', () => {
+    const t = document.createElement('div'); t.style.cssText = 'height:100dvh;position:absolute;visibility:hidden';
+    document.body.appendChild(t); const dvh = t.offsetHeight; t.remove();
+    const el = $('ekranOlcu');
+    if (el) el.textContent = `Ekran ölçümü: ${innerHeight} / ${screen.height} / ${dvh} / ${navigator.standalone ? 'A' : 'S'}`;
+  });
   applyTheme();
   render();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
