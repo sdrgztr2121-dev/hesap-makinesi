@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   const C = window.Calc;
-  const VERSION = '1.0.18';
+  const VERSION = '1.0.19';
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -10,7 +10,7 @@
     get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { } }
   };
-  const settings = Object.assign({ fix: 'norm', sound: false, theme: 'lacivert' }, store.get('hm.set', {}));
+  const settings = Object.assign({ fix: 'norm', sound: false, vib: true, theme: 'lacivert' }, store.get('hm.set', {}));
   let history = store.get('hm.hist', []);
   const st = C.newState();
   (function restore() {
@@ -136,6 +136,29 @@
   }
 
   let actx = null;
+  // Titreşim
+  // iPhone (iOS 18+): her tuşun üstünde görünmez bir "switch" durur; iOS sistem titreşimini
+  // yalnızca parmak gerçekten o anahtara dokununca çalar. Android: navigator.vibrate.
+  const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  function setupHaptics() {
+    if (!IS_IOS) return;
+    document.querySelectorAll('#kb [data-k]').forEach(el => {
+      if (el.querySelector(':scope > .hap')) return;
+      const lb = document.createElement('label');
+      lb.className = 'hap'; lb.setAttribute('aria-hidden', 'true');
+      const inp = document.createElement('input');
+      inp.type = 'checkbox'; inp.setAttribute('switch', ''); inp.tabIndex = -1;
+      inp.addEventListener('click', e => e.stopPropagation());
+      lb.append(inp);
+      el.append(lb);
+    });
+    applyHaptics();
+  }
+  function applyHaptics() { document.body.classList.toggle('no-hap', !settings.vib); }
+  function haptic() {
+    if (!settings.vib || IS_IOS) return;
+    try { if (navigator.vibrate) navigator.vibrate(8); } catch (e) { }
+  }
   function click() {
     if (!settings.sound) return;
     try {
@@ -209,12 +232,14 @@
   function renderSettings() {
     $('segFix').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.fix === String(settings.fix)));
     $('togSound').setAttribute('aria-checked', settings.sound ? 'true' : 'false');
+    $('togVib').setAttribute('aria-checked', settings.vib ? 'true' : 'false');
   }
   $('segFix').addEventListener('click', e => {
     const b = e.target.closest('[data-fix]'); if (!b) return;
     settings.fix = b.dataset.fix; saveSet(); renderSettings(); render();
   });
   $('togSound').onclick = () => { settings.sound = !settings.sound; saveSet(); renderSettings(); click(); };
+  $('togVib').onclick = () => { settings.vib = !settings.vib; saveSet(); renderSettings(); applyHaptics(); haptic(); };
 
   const THEMES = [
     { id: 'lacivert', name: 'Lacivert', body: '#1B2333', lcd: '#EEF1E6', key: '#3A4864', acc: '#E07A2E' },
@@ -267,6 +292,7 @@
   let prevKey = null, acCount = 0, acStart = 0;
   function clearScreen() { st.lines = []; st.tokens = []; st.cp = 0; st.recall = -1; st.error = null; saveState(); }
   function handle(key) {
+    haptic();
     click();
     const shifted = st.shift;
     if (key === 'ac' && !shifted) {
@@ -322,13 +348,33 @@
   document.addEventListener('gesturestart', e => e.preventDefault());
 
   $('ver').textContent = 'sürüm ' + VERSION;
-  document.querySelector('[data-open="about"]') && document.querySelector('[data-open="about"]').addEventListener('click', () => {
-    const t = document.createElement('div'); t.style.cssText = 'height:100dvh;position:absolute;visibility:hidden';
-    document.body.appendChild(t); const dvh = t.offsetHeight; t.remove();
+  // iOS 26 ana ekran uygulaması: sayfa kısa açılırsa belge tam ekran boyuna uzatılır (style.css) ve iOS tam alanı verir.
+  // İşe yaramazsa (belge kaydırılabilir kalırsa) kural geri alınır; kalan boşluk için alt pay küçültülür.
+  const root = document.documentElement;
+  const insetTop = () => Math.max(0, Math.round(parseFloat(getComputedStyle($('app')).paddingTop) - 6));
+  let lvhState = '-';
+  function checkGap() {
+    const sa = navigator.standalone === true;
+    const portrait = window.innerHeight > window.innerWidth;
+    document.body.classList.toggle('gap', sa && portrait && insetTop() > 0 && screen.height - window.innerHeight > 20);
+  }
+  function checkViewport() {
+    if (root.scrollHeight > window.innerHeight + 1) { root.classList.add('no-lvh'); lvhState = 'K'; }
+    else lvhState = root.classList.contains('no-lvh') ? 'K' : 'T';
+    checkGap();
+  }
+  function armViewport() { root.classList.remove('no-lvh'); checkGap(); setTimeout(checkViewport, 600); }
+  armViewport();
+  window.addEventListener('resize', () => { checkGap(); setTimeout(checkViewport, 300); });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') armViewport(); });
+  const aboutBtn = document.querySelector('[data-open="about"]');
+  if (aboutBtn) aboutBtn.addEventListener('click', () => {
+    const m = u => { const t = document.createElement('div'); t.style.cssText = 'height:100' + u + ';position:absolute;visibility:hidden'; document.body.appendChild(t); const h = t.offsetHeight; t.remove(); return h; };
     const el = $('ekranOlcu');
-    if (el) el.textContent = `Ekran ölçümü: ${innerHeight} / ${screen.height} / ${dvh} / ${navigator.standalone ? 'A' : 'S'}`;
+    if (el) el.textContent = `Ekran ölçümü: ${innerHeight} / ${screen.height} / ${m('dvh')} / ${m('lvh')} / ${insetTop()} / ${navigator.standalone ? 'A' : 'S'}${lvhState}${document.body.classList.contains('gap') ? 'B' : ''}`;
   });
   applyTheme();
+  setupHaptics();
   render();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
 

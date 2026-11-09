@@ -23,10 +23,6 @@
 <link rel="apple-touch-startup-image" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-440x956@3.png?v=4">
 <link rel="apple-touch-icon" href="icons/icon-v2.png">
 <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fontsource/caveat@5.3.0/files/caveat-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<script>
-/* Uygulama yüksekliği = sayfanın gerçek yüksekliği (iOS'un dvh hatasından bağımsız) */
-(function(){var d=document.documentElement;function fix(){d.style.setProperty('--app-h',window.innerHeight+'px');}fix();addEventListener('resize',fix);addEventListener('orientationchange',function(){setTimeout(fix,300);});addEventListener('pageshow',fix);document.addEventListener('visibilitychange',fix);})();
-</script>
 <link rel="stylesheet" href="style.css">
 </head>
 <body data-theme="lacivert">
@@ -116,6 +112,10 @@
     <div class="set row-flex">
       <div class="lbl">Tuş sesi</div>
       <button class="tog" id="togSound" role="switch" aria-checked="false"><i></i></button>
+    </div>
+    <div class="set row-flex">
+      <div class="lbl">Tuş titreşimi</div>
+      <button class="tog" id="togVib" role="switch" aria-checked="true"><i></i></button>
     </div>
     <button class="row" data-open="themes">Tema seç</button>
     <button class="row danger" id="setClear">Geçmişi temizle</button>
