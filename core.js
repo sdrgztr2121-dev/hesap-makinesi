@@ -163,8 +163,8 @@
     let p = 0;
     const peek = () => L[p] && L[p].k;
     const atEnd = () => p >= L.length;
-    const startsPrimary = k => k === 'num' || k === 'π' || k === 'Ans' || k === 'PreAns' || OPENERS.has(k);
-    const closesValue = k => k === ')' || k === '⟫' || k === '⟩' || k === 'π' || k === 'Ans' || k === 'PreAns' || k === '²' || k === '%';
+    const startsPrimary = k => k === 'num' || k === 'π' || k === 'Ans' || k === 'PreAns' || k === 'A' || k === 'B' || k === 'C' || k === 'D' || OPENERS.has(k);
+    const closesValue = k => k === ')' || k === '⟫' || k === '⟩' || k === 'π' || k === 'Ans' || k === 'PreAns' || k === 'A' || k === 'B' || k === 'C' || k === 'D' || k === '²' || k === '%';
 
     function expect(k, optionalAtEnd) {
       if (peek() === k) { p++; return; }
@@ -231,6 +231,7 @@
         case 'num': return t.v;
         case 'π': return F(Math.PI);
         case 'Ans': return env.ans || R(0n);
+        case 'A': case 'B': case 'C': case 'D': return (env.mem && env.mem[t.k]) || R(0n);
         case 'PreAns': return env.preAns || R(0n);
         case '(': { const v = expr(); expect(')', true); return v; }
         case '√(': { const v = expr(); expect('⟫', true); return sqrt(v); }
@@ -448,6 +449,7 @@
       case 'pi': ins(['π']); break;
       case 'ans': ins(['Ans']); break;
       case 'preans': ins(['PreAns']); break;
+      case 'mA': case 'mB': case 'mC': case 'mD': ins([key[1]]); break;
       case 'del': backspace(st); break;
       case 'ac': st.tokens = []; st.cp = 0; st.recall = -1; break;
       case 'clrall': fx.push({ type: 'confirmClear' }); break;

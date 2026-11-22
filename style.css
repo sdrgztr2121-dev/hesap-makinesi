@@ -124,3 +124,16 @@ body.shift .k-shift{box-shadow:0 0 0 2px var(--keyt) inset}
 body.gap #app{padding-bottom:10px}
 /* titreşim: tuş üstü görünmez anahtar */
 .hap{position:absolute;inset:0;z-index:2;touch-action:manipulation;-webkit-tap-highlight-color:transparent;border-radius:inherit}.hap input{position:absolute;width:1px;height:1px;margin:0;visibility:hidden}body.no-hap .hap{display:none}.k-split span{position:relative}
+
+/* hafıza satırı */
+.kb .k-sto,.kb .k-mem{height:40px}
+.k-sto{font-family:system-ui,-apple-system,sans-serif;font-size:11px;line-height:1.15;font-weight:500;background:var(--key);color:var(--sl)}
+.k-mem{flex-direction:column;gap:0;background:var(--key);padding:0 3px}
+.k-mem b{font-family:var(--hw);font-size:22px;font-weight:500;line-height:1}
+.k-mem em{font-style:normal;font-size:10px;line-height:1.1;color:var(--muted,#8A93A6);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:system-ui,-apple-system,sans-serif}
+.k-mem.has em{color:var(--sl)}
+body.sto .k-sto{background:var(--acc);color:var(--acct)}
+body.sto .k-mem{box-shadow:0 0 0 2px var(--acc) inset;animation:stoPulse 1s ease-in-out infinite}
+@keyframes stoPulse{50%{box-shadow:0 0 0 2px transparent inset}}
+@media (max-height:720px){.kb .k-sto,.kb .k-mem{height:36px}}
+@media (max-height:640px){.kb .k-sto,.kb .k-mem{height:32px}.k-mem b{font-size:18px}}

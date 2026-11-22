@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   const C = window.Calc;
-  const VERSION = '1.0.19';
+  const VERSION = '1.0.20';
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -13,6 +13,9 @@
   const settings = Object.assign({ fix: 'norm', sound: false, vib: true, theme: 'lacivert' }, store.get('hm.set', {}));
   let history = store.get('hm.hist', []);
   const st = C.newState();
+  st.mem = {};
+  (function loadMem() { const m = store.get('hm.mem', {}); for (const k of ['A', 'B', 'C', 'D']) if (m[k]) { try { st.mem[k] = C.deser(m[k]); } catch (e) { } } })();
+  const saveMem = () => { const o = {}; for (const k in st.mem) o[k] = C.ser(st.mem[k]); store.set('hm.mem', o); };
   (function restore() {
     const s = store.get('hm.state', null);
     if (!s) return;
@@ -85,6 +88,7 @@
         case '²': out.push('<sup>2</sup>'); break;
         case 'E': out.push('×10<sup>'); inExp = true; break;
         case 'Ans': out.push(ctx && ctx.ans ? '(' + esc(C.format(ctx.ans, fmtOpt())) + ')' : 'Ans'); break;
+        case 'A': case 'B': case 'C': case 'D': out.push(ctx && ctx.mem && ctx.mem[t] ? '(' + esc(C.format(C.deser(ctx.mem[t]), fmtOpt())) + ')' : '<span class="op">' + t + '</span>'); break;
         case 'PreAns': out.push(ctx && ctx.pre ? '(' + esc(C.format(ctx.pre, fmtOpt())) + ')' : 'PreAns'); break;
         case '+': case '−': case '×': case '÷': {
           const pv = toks[i - 1];
@@ -207,7 +211,7 @@
       const d = dayLabel(e.t);
       if (d !== last) { h += `<div class="pd">${d}</div>`; last = d; }
       const v = C.deser(e.v);
-      h += `<div class="pe" data-h="${i}"><span class="t">${timeLabel(e.t)}</span>${tokensHTML(e.tokens, -1, { ans: C.deser(e.a), pre: C.deser(e.p) })} = <b>${valueHTML(v, false)}</b></div>`;
+      h += `<div class="pe" data-h="${i}"><span class="t">${timeLabel(e.t)}</span>${tokensHTML(e.tokens, -1, { ans: C.deser(e.a), pre: C.deser(e.p), mem: e.m })} = <b>${valueHTML(v, false)}</b></div>`;
     }
     list.innerHTML = h;
     const paper = $('paper');
@@ -236,7 +240,7 @@
   }
   $('segFix').addEventListener('click', e => {
     const b = e.target.closest('[data-fix]'); if (!b) return;
-    settings.fix = b.dataset.fix; saveSet(); renderSettings(); render();
+    settings.fix = b.dataset.fix; saveSet(); renderSettings(); renderMem(); render();
   });
   $('togSound').onclick = () => { settings.sound = !settings.sound; saveSet(); renderSettings(); click(); };
   $('togVib').onclick = () => { settings.vib = !settings.vib; saveSet(); renderSettings(); applyHaptics(); haptic(); };
@@ -290,6 +294,17 @@
   // Kısayollar: AC'ye 3 kez üst üste basınca ekran temizlenir; = ile hesap bittikten sonra
   // bir kez daha = basınca geçmiş defteri açılır.
   let prevKey = null, acCount = 0, acStart = 0;
+  let stoMode = false, stoValue = null;
+  function renderMem() {
+    document.body.classList.toggle('sto', stoMode);
+    for (const k of ['A', 'B', 'C', 'D']) {
+      const el = $('mem' + k); if (!el) continue;
+      const v = st.mem[k];
+      el.textContent = v ? C.format(v, Object.assign(fmtOpt(), { sup: false })) : '—';
+      el.parentElement.classList.toggle('has', !!v);
+    }
+    const b = $('btnSto'); if (b) b.innerHTML = stoMode ? 'Hangisine?' : 'Hafızaya<br>al';
+  }
   function clearScreen() { st.lines = []; st.tokens = []; st.cp = 0; st.recall = -1; st.error = null; saveState(); }
   function handle(key) {
     haptic();
@@ -303,6 +318,26 @@
         return;
       }
     }
+    // Hafıza: "Hafızaya al" → A/B/C/D seç. Yazılan sayı (ya da ifade) varsa o, yoksa son sonuç kaydedilir.
+    if (key === 'sto') {
+      st.shift = false; prevKey = null;
+      if (stoMode) { stoMode = false; renderMem(); return; }
+      let v = null;
+      if (st.tokens.length) { const r = C.evaluate(st.tokens, st); if (r.ok) v = r.v; else { toast('Önce geçerli bir sayı yaz'); return; } }
+      else if (st.lines.length) v = st.ans;
+      if (!v) { toast('Kaydedilecek sayı yok'); return; }
+      stoValue = v; stoMode = true; renderMem(); return;
+    }
+    if (stoMode) {
+      if (/^m[ABCD]$/.test(key)) {
+        const k = key[1]; st.mem[k] = stoValue; saveMem();
+        stoMode = false; stoValue = null; prevKey = null; renderMem(); render();
+        toast(k + ' = ' + C.format(st.mem[k], fmtOpt()));
+        return;
+      }
+      stoMode = false; stoValue = null; renderMem();
+    }
+    if (/^m[ABCD]$/.test(key) && !st.mem[key[1]]) { toast(key[1] + ' hafızası boş'); return; }
     if (key === 'eq' && !shifted && prevKey === 'eq' && !st.tokens.length && !st.error) {
       prevKey = null; open('history'); render(); return;
     }
@@ -311,7 +346,8 @@
     for (const f of fx) {
       if (f.type === 'historyAdd') {
         const l = f.line;
-        history.push({ tokens: l.tokens, v: C.ser(l.v), t: l.t, a: C.ser(l.ansUsed), p: C.ser(l.preUsed) });
+        const usedMem = {}; for (const t of l.tokens) if (/^[ABCD]$/.test(t) && st.mem[t]) usedMem[t] = C.ser(st.mem[t]);
+        history.push({ tokens: l.tokens, v: C.ser(l.v), t: l.t, a: C.ser(l.ansUsed), p: C.ser(l.preUsed), m: Object.keys(usedMem).length ? usedMem : undefined });
         saveHist();
       } else if (f.type === 'confirmClear') {
         clearScreen(); toast('Ekran temizlendi');
@@ -375,6 +411,7 @@
   });
   applyTheme();
   setupHaptics();
+  renderMem();
   render();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
 
