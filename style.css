@@ -137,3 +137,4 @@ body.sto .k-mem{box-shadow:0 0 0 2px var(--acc) inset;animation:stoPulse 1s ease
 @keyframes stoPulse{50%{box-shadow:0 0 0 2px transparent inset}}
 @media (max-height:720px){.kb .k-sto,.kb .k-mem{height:36px}}
 @media (max-height:640px){.kb .k-sto,.kb .k-mem{height:32px}.k-mem b{font-size:18px}}
+.k-mem{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}.k-mem.lp{background:var(--ac);transform:scale(.94)}

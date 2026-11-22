@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   const C = window.Calc;
-  const VERSION = '1.0.20';
+  const VERSION = '1.0.21';
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -357,8 +357,28 @@
     saveState();
     render();
   }
+  // A–D tuşuna basılı tutunca (0,6 sn) o hafıza silinir; bırakınca tuş ayrıca çalışmaz
+  let lpTimer = null, lpFired = null;
+  const lpCancel = () => { clearTimeout(lpTimer); lpTimer = null; };
+  $('kb').addEventListener('pointerdown', e => {
+    const b = e.target.closest('.k-mem'); if (!b) return;
+    lpCancel(); lpFired = null;
+    const k = b.dataset.k[1];
+    lpTimer = setTimeout(() => {
+      lpTimer = null; lpFired = b;
+      stoMode = false; stoValue = null;
+      if (st.mem[k]) { delete st.mem[k]; saveMem(); toast(k + ' hafızası silindi'); }
+      else toast(k + ' zaten boş');
+      b.classList.add('lp'); setTimeout(() => b.classList.remove('lp'), 250);
+      renderMem(); render();
+    }, 600);
+  });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => $('kb').addEventListener(t, lpCancel));
+  $('kb').addEventListener('contextmenu', e => { if (e.target.closest('.k-mem')) e.preventDefault(); });
   $('kb').addEventListener('click', e => {
     const b = e.target.closest('[data-k]');
+    if (b && lpFired && b === lpFired) { lpFired = null; return; }
+    lpFired = null;
     if (b) handle(b.dataset.k);
   });
   lcd.addEventListener('click', e => {
